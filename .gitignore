@@ -1,0 +1,27 @@
+# Secrets — never commit
+.env
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Test cache
+.pytest_cache/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Uploaded annual report PDFs
+*.pdf
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
