@@ -41,8 +41,8 @@ if mode=='双年报 · 多年对比':
 
 st.caption('每份 PDF 最多 25 MB。上传文件在网站服务器上处理；只有点击生成 AI 分析时，预览中列出的材料才会发送给 OpenAI。')
 uploaded = st.file_uploader('上传年报 / Upload annual report', type=['pdf'],
-                            help='支持中英文 PDF；扫描页或乱码页可使用本地 OCR。')
-st.caption('如果上传框直接显示 Error 且下方没有处理进度：请刷新页面、确认本地网页仍能打开，再重新选择文件。')
+                            help='支持中英文 PDF；扫描页或乱码页可使用 OCR 文字识别。')
+st.caption('如果上传框直接显示 Error 且下方没有处理进度：请刷新网页后重新选择文件。')
 if uploaded is None:
     render_empty()
     st.stop()
@@ -76,7 +76,7 @@ if document.scanned_warning:
 st.caption(f'{uploaded.name} · {document.page_count} 页 · {document.file_size_kb/1024:.1f} MB · '+{'zh': '中文', 'en': 'English'}.get(document.language, '未知语言'))
 
 if extraction_failed:
-    st.error('财务报表提取中断。PDF 已读取，你仍可查看下方原文；可尝试本地 OCR 或重新选择文件。')
+    st.error('财务报表提取中断。PDF 已读取，你仍可查看下方原文；可尝试 OCR 文字识别或重新选择文件。')
 elif not has_values:
     st.warning('PDF 已读取，但未提取到可用财务金额。若文字不可复制，请展开下方「文字识别」并选择报表页；否则请查看文档信息中的文本预览。')
 

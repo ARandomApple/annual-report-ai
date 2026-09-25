@@ -23,7 +23,7 @@ def _fmt(value):
 
 def render_comparison_upload(load_document,load_report):
     st.caption('例如：2025 年报与 2024 年报，可覆盖 2023—2025 年。实际年度取决于文件内容。')
-    st.caption('上传框若直接显示 Error 且没有处理进度，请刷新网页、确认本地服务仍在运行后重试。')
+    st.caption('上传框若直接显示 Error 且没有处理进度，请刷新网页后重新上传。')
     a,b=st.columns(2)
     with a:first=st.file_uploader('年报 A',type=['pdf'],key='report_a')
     with b:second=st.file_uploader('年报 B',type=['pdf'],key='report_b')
@@ -48,7 +48,7 @@ def render_comparison_upload(load_document,load_report):
                 report=load_report(content,file.name)
             except Exception:
                 processing.update(label=f'年报 {index} 提取失败',state='error',expanded=True)
-                st.error(f'年报 {index}：PDF 已读取，但财务表格提取中断。可先核对文本预览，或使用本地 OCR。');return
+                st.error(f'年报 {index}：PDF 已读取，但财务表格提取中断。可先核对文本预览，或使用 OCR 文字识别。');return
             sources.append(ReportSource(f'D{index}',document,report,fingerprints[index-1]))
         processing.update(label='两份年报已读取 · 正在核对公司和数据口径',state='complete',expanded=False)
     for source in sources:

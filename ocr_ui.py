@@ -38,7 +38,7 @@ def render_ocr(data,name,document,report,prefix='single'):
         if st.button('识别财务报表',key=key+'_run',disabled=not ready,type='primary'):
             try:
                 pages=parse_page_selection(selected,document.page_count)
-                progress=st.progress(0,text='正在准备本地 OCR…')
+                progress=st.progress(0,text='正在准备 OCR 文字识别…')
                 with st.spinner('正在服务器识别文字，请稍候…'):
                     recognized=recognize_pdf(data,pages,lambda ratio,text:progress.progress(ratio,text=text))
                     progress.progress(1.0,text='文字识别完成，正在重新定位财务报表…')

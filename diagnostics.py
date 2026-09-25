@@ -17,7 +17,7 @@ def pdf_failure_message(error):
         return '此 PDF 需要密码。请先在本机打开并导出无密码副本，再重新上传。'
     if any(term in detail for term in ('empty', 'broken', 'invalid', 'not a pdf', 'format')):
         return '文件不是可读取的 PDF，或内容已损坏。请重新下载原年报后上传。'
-    return '无法读取此 PDF。请确认文件能在电脑上打开；若上传框直接显示 Error，请刷新网页并确认本地服务仍在运行。'
+    return '无法读取此 PDF。请确认文件能在电脑上打开；若上传框直接显示 Error，请刷新网页后重新上传。'
 
 
 def metric_issue(reason):
@@ -27,7 +27,7 @@ def metric_issue(reason):
     for key, label in FIELD_NAMES.items():
         result = re.sub(rf'\b{re.escape(key)}\b', label, result)
     if '缺少' in reason or '缺失' in reason:
-        action = '请核对下方报表是否识别了该科目；扫描件或乱码页可尝试本地 OCR。'
+        action = '请核对下方报表是否识别了该科目；扫描件或乱码页可尝试 OCR 文字识别。'
     elif '币种' in reason or '单位' in reason:
         action = '请核对原报表的币种和金额单位；系统不会猜测或自动换汇。'
     elif '冲突' in reason or '多个' in reason or '重述' in reason:

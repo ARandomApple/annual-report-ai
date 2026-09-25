@@ -47,7 +47,7 @@ def apply_theme():
 
 def render_hero():
     st.markdown('''<div class="hero"><div><div class="eyebrow">ANNUAL REPORT STUDIO</div>
-    <span class="pill">本地解析</span><span class="pill">数据可追溯</span>
+    <span class="pill">在线解析</span><span class="pill">数据可追溯</span>
     <h1>把厚厚的年报，<br>变成看得懂的图表。</h1>
     <p>从营收到现金流，读懂公司的年度变化。<br>上传 PDF，开始你的财务探索。</p></div>
     <svg class="hero-art" viewBox="0 0 240 155" aria-hidden="true">
@@ -66,7 +66,7 @@ def render_empty():
     st.info('请选择一份年报 PDF 开始。')
     for col,(icon,title,body) in zip(st.columns(3),[
         ('◈','数据，一眼看清','用关键指标和年度图表，查看经营表现。'),
-        ('▤','难读 PDF，也能识别','本地 OCR 处理扫描页或乱码页，可逐页核对。'),
+        ('▤','难读 PDF，也能识别','OCR 可识别扫描页或乱码页，并逐页核对。'),
         ('↗','变化，有据可查','对比相邻年报，每个数字都保留来源页码。')]):
         with col:st.markdown(f'<div class="feature"><div class="icon">{icon}</div><h3>{title}</h3><p>{body}</p></div>',unsafe_allow_html=True)
 
@@ -175,7 +175,7 @@ def dashboard_data(report, scope):
         if current is None:
             comparison_reason=metric_issue('；'.join(dict.fromkeys(reasons))) or '当前年度金额尚未可靠识别，请查看下方详细数据。'
         elif previous is None:
-            comparison_reason='缺少上一年度可用数值。请在详细数据中核对上一年列；扫描件可尝试本地 OCR。'
+            comparison_reason='缺少上一年度可用数值。请在详细数据中核对上一年列；扫描件可尝试 OCR 文字识别。'
         elif not fiscal_match:
             comparison_reason='两年报表期间或重述口径无法可靠匹配，请核对原始年份列。'
         else:
