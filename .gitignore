@@ -1,5 +1,11 @@
 # Secrets — never commit
 .env
+.ocr_runtime/
+.ocr_models/
+ocr_runtime/
+
+# Local work notes
+SESSION_STATUS.md
 
 # Python bytecode
 __pycache__/

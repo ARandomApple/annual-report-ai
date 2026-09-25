@@ -102,7 +102,7 @@ class FinancialValue:
     parsed_number: ParsedNumber
     period: ReportingPeriod
     unit: str = ""                       # e.g. "CNY", "USD", "SGD"
-    multiplier: float = 1.0              # e.g. 1_000_000 for "百万元"
+    multiplier: float | None = 1.0              # e.g. 1_000_000 for "百万元"
     source_page: int = 0
     raw_label: str = ""                  # original label text from the PDF
     raw_value_str: str = ""              # original value string from the PDF
@@ -111,8 +111,8 @@ class FinancialValue:
 
     @property
     def normalized_value(self) -> float | None:
-        """The value scaled to base units (value × multiplier)."""
-        if self.parsed_number.value is None:
+        """The value scaled to base units, or None when the scale is unknown."""
+        if self.parsed_number.value is None or self.multiplier is None:
             return None
         return self.parsed_number.value * self.multiplier
 

@@ -12,6 +12,10 @@ from typing import Optional
 import pymupdf
 
 
+class PasswordRequiredError(ValueError):
+    """A PDF can be opened but its pages require authentication."""
+
+
 # ---------------------------------------------------------------------------
 # Character ranges for language detection
 # ---------------------------------------------------------------------------
@@ -115,10 +119,13 @@ def assess_text_quality(full_text: str, page_count: int, min_chars_per_page: int
         warning = (
             "⚠️ This PDF may be a scanned document. "
             f"Only {chars_per_page:.0f} characters of text were extracted per page on average. "
-            "OCR support will be added in a future release."
+            "请使用页面下方的本地 OCR 文字识别。"
         )
     else:
         warning = None
+    unusual=len(re.findall(r'[\u1d00-\u2fff\u3100-\u4dbf\ufffd]',full_text))
+    if total_chars>100 and unusual/total_chars>.12:
+        warning='PDF 文字层疑似乱码：页面可能正常显示，但提取文本不可读。请使用本地 OCR 识别财务报表页。'
 
     return {
         "scanned_likely": scanned_likely,
@@ -169,6 +176,8 @@ class PdfDocument:
 
     # Page-level access
     pages: list[PdfPage] = field(default_factory=list)
+    ocr_page_numbers: list[int] = field(default_factory=list)
+    ocr_verified: bool = False
 
 
 # ---------------------------------------------------------------------------
@@ -180,6 +189,7 @@ def parse_pdf(
     file_bytes: bytes,
     file_name: str,
     preview_chars: int = 5000,
+    ocr_pages: dict | None = None,
 ) -> PdfDocument:
     """
     Parse a PDF from raw bytes and return a PdfDocument.
@@ -196,12 +206,15 @@ def parse_pdf(
         PdfDocument with extracted metadata, text, language, and quality info.
     """
     doc = pymupdf.open(stream=file_bytes, filetype="pdf")
+    if doc.needs_pass:
+        doc.close()
+        raise PasswordRequiredError('PDF password required')
 
     # --- Extract text from every page --------------------------------------
     full_text_parts: list[str] = []
     pages: list[PdfPage] = []
     for page_num, page in enumerate(doc, start=1):
-        page_text = page.get_text()
+        page_text = ocr_pages[page_num].get_text() if ocr_pages and page_num in ocr_pages else page.get_text()
         full_text_parts.append(page_text)
         pages.append(PdfPage(
             page_number=page_num,
@@ -233,6 +246,7 @@ def parse_pdf(
         scanned_warning=quality["warning"],
         chars_per_page=quality["chars_per_page"],
         pages=pages,
+        ocr_page_numbers=sorted(ocr_pages or {}),
     )
 
     doc.close()

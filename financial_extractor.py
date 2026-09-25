@@ -69,6 +69,9 @@ def parse_financial_number(raw: str) -> ParsedNumber:
     value_type = ValueType.UNKNOWN
     cleaned = original
 
+    # Financial tables may repeat a currency glyph in selected cells.
+    cleaned = re.sub(r'^[\$¥￥€£]\s*', '', cleaned)
+
     # --- Surface type signals ------------------------------------------------
     if _PCT_PATTERN.search(cleaned):
         value_type = ValueType.PERCENTAGE
@@ -124,24 +127,29 @@ def parse_financial_number(raw: str) -> ParsedNumber:
 _STATEMENT_HEADINGS: dict[StatementType, list[str]] = {
     StatementType.BALANCE_SHEET: [
         "资产负债表", "合并资产负债表", "财务状况表", "合并财务状况表",
+        "概要合并财务状况表",
         "Balance Sheet", "Consolidated Balance Sheet",
+        "Consolidated Balance Sheets",
         "Statement of Financial Position",
         "Consolidated Statement of Financial Position",
     ],
     StatementType.INCOME_STATEMENT: [
         "利润表", "合并利润表", "损益表", "合并损益表",
+        "概要合并利润及其他综合收益表",
         "综合收益表", "合并综合收益表",
         "Income Statement", "Consolidated Income Statement",
         "Statement of Operations", "Statement of Income",
+        "Consolidated Statements of Operations",
         "Statement of Profit or Loss",
         "Consolidated Statement of Profit or Loss",
         "Statement of Comprehensive Income",
         "Consolidated Statement of Comprehensive Income",
     ],
     StatementType.CASH_FLOW: [
-        "现金流量表", "合并现金流量表",
+        "现金流量表", "合并现金流量表", "概要合并现金流量表",
         "Cash Flow Statement", "Statement of Cash Flows",
         "Consolidated Statement of Cash Flows",
+        "Consolidated Statements of Cash Flows",
     ],
 }
 
@@ -155,8 +163,8 @@ _HEADING_REGEX: dict[StatementType, list[re.Pattern]] = {
 # CONSOLIDATED: 合并 or "Consolidated" + recognised statement heading phrase
 _CONSOLIDATED_PATTERN = re.compile(
     r"合并"
-    r"|Consolidated\s+(?:Balance\s+Sheet|Income\s+Statement"
-    r"|Statement\s+of\s+(?:Financial\s+Position|Cash\s+Flows"
+    r"|Consolidated\s+(?:Balance\s+Sheets?|Income\s+Statements?"
+    r"|Statements?\s+of\s+(?:Operations|Financial\s+Position|Cash\s+Flows"
     r"|Profit\s+or\s+Loss|Comprehensive\s+Income))",
     re.IGNORECASE,
 )
@@ -314,6 +322,19 @@ def _heading_score(page: PdfPage) -> dict:
     if len(_DOT_LEADER.findall(top_text)) > 2:
         return result
     if len(_PAGE_REF.findall(top_text)) > 5:
+        return result
+
+    # A compact list of several statement titles is a local contents page,
+    # even when it lacks the word "Contents" or dotted leaders.
+    structural_types = set()
+    for stype, patterns in _HEADING_REGEX.items():
+        for line in top_text.splitlines():
+            for pattern in patterns:
+                match = pattern.search(line)
+                if match and _is_structural_heading(line, match.start(), match.end()):
+                    structural_types.add(stype)
+                    break
+    if len(structural_types) >= 2:
         return result
 
     # --- Search for heading patterns in top text -----------------------------
