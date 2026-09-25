@@ -4,7 +4,7 @@ Upload a company's annual report (PDF) and receive AI-powered financial analysis
 
 **Current checkpoint — 2026-09-24:** Upload one or two PDFs, inspect financial statements, compare multiple years, compute deterministic metrics and review all-period accounting checks in Streamlit. On-demand GPT analysis is wired; configure an OpenAI API key to enable real requests.
 
-**2026-09-25 update:** The interface now leads with colorful financial cards and interactive charts. Local OCR can recover Chinese and English text from scanned PDFs and PDFs with unreadable text layers. The included Xiaomi 2025 annual report has been checked end to end: PDF pages 270–273 and 278–279 produce 2025/2024 income, balance sheet, and cash-flow figures. OCR figures remain provisional until the original pages have been reviewed. ChatGPT Plus does not include OpenAI API usage; uploading, OCR, charts, comparison, and validations run without API charges.
+**2026-09-25 update:** The interface now leads with colorful financial cards and interactive charts. Local OCR can recover Chinese and English text from scanned PDFs and PDFs with unreadable text layers. A locally available Xiaomi 2025 annual report has been checked end to end: PDF pages 270–273 and 278–279 produce 2025/2024 income, balance sheet, and cash-flow figures. OCR figures remain provisional until the original pages have been reviewed. ChatGPT Plus does not include OpenAI API usage; uploading, OCR, charts, comparison, and validations run without API charges.
 
 **Interactive overview:** The first four cards remain revenue, net income, operating cash flow, and revenue growth. Scroll the card rail or use its arrows to choose among 15 indicators. Clicking a card shows the current and prior year's values, their difference, and a percentage change where the prior monetary value is positive; percentage indicators instead use percentage-point differences. Paired bars are used only for nonnegative values. A line chart appears only when at least three consecutive, fiscally compatible years are available. The decorative 3D model has been removed. Sources retain PDF pages, missing values are not treated as zero, and incompatible currencies are not combined. Money units adapt between yuan, ten-thousand yuan, and hundred-million yuan to avoid displaying small nonzero values as 0.00.
 
@@ -14,7 +14,7 @@ Upload a company's annual report (PDF) and receive AI-powered financial analysis
 
 For local development, run `python setup_ocr.py` once to install RapidOCR and the pinned PP-OCRv5 recognition model into ignored local folders. The cloud deployment instead uses `requirements.txt` and the bundled `models/` copy. The local setup downloads packages and a model; locally processed annual-report data stays on your computer. A cloud deployment processes uploaded files on its server. For a PDF whose text copies as gibberish, upload it, expand **文字识别与原图核对**, then click **识别财务报表**. The page field may be left empty for automatic discovery, or filled with PDF page ranges such as `270-273,278-279`. The 20-page limit prevents long full-report OCR runs. Check the page images beside the recognized text, particularly amounts, negative signs, years, and units. GPT analysis remains unavailable until you confirm that review. The original PDF is not rewritten.
 
-If `http://127.0.0.1:8501/` refuses to connect after a computer restart or closing the terminal, run `streamlit run app.py` again. On this computer, the supplied `outputs/Start-Annual-Report.cmd` shortcut also starts the server. The app runs locally and stops when its server process stops.
+If `http://127.0.0.1:8501/` refuses to connect after a computer restart or closing the terminal, run `streamlit run app.py` again. The app runs locally and stops when its server process stops.
 
 ## Public HTTPS deployment
 
@@ -260,7 +260,7 @@ switching scope changed 2025 revenue from the consolidated amount to the parent
 amount correctly. AppTest verifies app execution and widget interactions; this
 checkpoint does not include a browser screenshot/layout audit.
 
-See SESSION_STATUS.md for the stopping point and next work.
+Later sections in this README record subsequent work.
 
 
 ## Financial metrics and validation — 2026-09-24
@@ -316,7 +316,7 @@ case count is 65 (30 extraction + 28 finance + 7 UI).
 
 ## GPT integration — 2026-09-24
 
-The financial-data page now has a GPT section. Local PDF extraction and metric
+The financial-data page now has a GPT section. PDF extraction and metric
 calculations never call OpenAI. Only the explicit Generate AI Analysis button
 sends a request. Each visitor must enter their own key in the web UI; a
 server-side key cannot enable this button. The key is kept for the current
